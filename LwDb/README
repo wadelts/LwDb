@@ -1,0 +1,14 @@
+This project defines a class for simplifying queries and updates over a database connection.
+It allows you submit SELECTs, INSERTs, UPDATEs and DELETEs to a JDBC-connected  database
+without having to know SQL.
+
+The entry point for using this project is the following class:
+
+	DbConnection			encapsulates request-handling for a database connection.
+
+	
+See the TestDbConnectionPositiveTests.java JUnit test case for an example of performing
+queries, inserts and deletes.
+
+See the GeMHa project for example use of these classes, especially AcceptMessagesFromQueue.java and
+StoreMesssageToQueue.java.
