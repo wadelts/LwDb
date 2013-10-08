@@ -15,9 +15,9 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import lw.db.LwDbConnection;
-import lw.db.LwDbException;
-import lw.db.LwDbQueryResult;
+import lw.db.DbConnection;
+import lw.db.DbException;
+import lw.db.DbQueryResult;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -60,10 +60,10 @@ public class TestDbConnectionPositiveTests {
 	 */
 	@Test
 	public void testLwDbConnectionFromClass() {
-		LwDbConnection dbConn = null;
+		DbConnection dbConn = null;
 		try {
-			dbConn = new LwDbConnection(connectionDriverName, connectionURL, connectionUserName, connectionPassword, false);
-		} catch (LwDbException e) {
+			dbConn = new DbConnection(connectionDriverName, connectionURL, connectionUserName, connectionPassword, false);
+		} catch (DbException e) {
 			fail("Couldn't connect. " + e);
 		}
 		
@@ -71,10 +71,10 @@ public class TestDbConnectionPositiveTests {
 		selectCols.put("groupId", "");
 		selectCols.put("groupDescription", "");
 		Properties whereCols = new Properties();
-		LwDbQueryResult result = null;
+		DbQueryResult result = null;
 		try {
 			result = dbConn.getQueryResults("users.CorpGroup", selectCols, whereCols);
-		} catch (LwDbException e) {
+		} catch (DbException e) {
 			fail("Couldn't SELECT CorpGroup data. " + e);
 		}
 
@@ -97,10 +97,10 @@ public class TestDbConnectionPositiveTests {
 	 */
 	@Test
 	public void testDirectInsertAndDelete() {
-		LwDbConnection dbConn = null;
+		DbConnection dbConn = null;
 		try {
-			dbConn = new LwDbConnection(connectionDriverName, connectionURL, connectionUserName, connectionPassword, false);
-		} catch (LwDbException e) {
+			dbConn = new DbConnection(connectionDriverName, connectionURL, connectionUserName, connectionPassword, false);
+		} catch (DbException e) {
 			fail("Couldn't connect. " + e);
 		}
 		
@@ -114,7 +114,7 @@ public class TestDbConnectionPositiveTests {
 			int numRowsProcessed = dbConn.insert("users.CorpGroup", insertRow);
 			assertEquals("Incorrect number of rows inserted", 1, numRowsProcessed);
 			dbConn.sessionCommit();
-		} catch (LwDbException e) {
+		} catch (DbException e) {
 			fail("Couldn't INSERT into CorpGroup table. " + e);
 		}
 		
@@ -123,10 +123,10 @@ public class TestDbConnectionPositiveTests {
 		selectCols.put("groupId", "");
 		selectCols.put("groupDescription", "");
 		Properties whereCols = new Properties();
-		LwDbQueryResult result = null;
+		DbQueryResult result = null;
 		try {
 			result = dbConn.getQueryResults("users.CorpGroup", selectCols, whereCols);
-		} catch (LwDbException e) {
+		} catch (DbException e) {
 			fail("Couldn't SELECT CorpGroup data. " + e);
 		}
 
@@ -154,7 +154,7 @@ public class TestDbConnectionPositiveTests {
 			int numRowsProcessed = dbConn.delete("users.CorpGroup", deletetRowWhere);
 			assertEquals("Incorrect number of rows removed", 1, numRowsProcessed);
 			dbConn.sessionCommit();
-		} catch (LwDbException e) {
+		} catch (DbException e) {
 			fail("Couldn't DELETE from CorpGroup table. " + e);
 		}
 
@@ -162,7 +162,7 @@ public class TestDbConnectionPositiveTests {
 		// SELECT to test delete was successful
 		try {
 			result = dbConn.getQueryResults("users.CorpGroup", selectCols, whereCols);
-		} catch (LwDbException e) {
+		} catch (DbException e) {
 			fail("Couldn't SELECT CorpGroup data. " + e);
 		}
 
@@ -173,7 +173,7 @@ public class TestDbConnectionPositiveTests {
 	}
 
 	/**
-	 * Test method for {@link lw.db.LwDbConnection#LwDbConnection(java.sql.Connection)}.
+	 * Test method for {@link lw.db.DbConnection#LwDbConnection(java.sql.Connection)}.
 	 */
 	@Test
 	public void testLwDbConnectionConnection() {

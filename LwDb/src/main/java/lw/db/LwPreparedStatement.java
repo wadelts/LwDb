@@ -50,7 +50,7 @@ public class LwPreparedStatement {
 	* @param LwPreparedStatementTemplate the instructions for creating the Prepared Statement
     */
 	public LwPreparedStatement(LwPreparedStatementTemplate preparedStatementTemplate)
-																		throws LwDbException {
+																		throws DbException {
 		checkNullArgument(preparedStatementTemplate);
 
 		this.preparedStatementName = preparedStatementTemplate.getPreparedStatementName();
@@ -64,7 +64,7 @@ public class LwPreparedStatement {
 
 		// Make sure parameter columns numbers match number of ?'s
 		if (paramColumns.size() != numParameters) {
-			throw new LwDbException("LwPreparedStatement constructor: Fatal error: Prepared Statement " + preparedStatementName + " had incorrect number of parameters: found " + paramColumns.size() + " expected " + numParameters);
+			throw new DbException("LwPreparedStatement constructor: Fatal error: Prepared Statement " + preparedStatementName + " had incorrect number of parameters: found " + paramColumns.size() + " expected " + numParameters);
 		}
 	}
 
@@ -134,9 +134,9 @@ public class LwPreparedStatement {
 	  * @return the number of rows affected by the action
     */
 	public int executeUpdate()
-							throws SQLException, LwDbException {
+							throws SQLException, DbException {
 		if (preparedStatement == null) {
-			throw new LwDbException("LwPreparedStatement.executeUpdate(): Fatal error: preparedStatement was null");
+			throw new DbException("LwPreparedStatement.executeUpdate(): Fatal error: preparedStatement was null");
 		}
 
 		return preparedStatement.executeUpdate();
@@ -148,10 +148,10 @@ public class LwPreparedStatement {
 	* @return the result set
     */
 	public ResultSet executeQuery()
-							throws SQLException, LwDbException {
+							throws SQLException, DbException {
 
 		if (preparedStatement == null) {
-			throw new LwDbException("LwPreparedStatement.executeUpdate(): Fatal error: preparedStatement was null");
+			throw new DbException("LwPreparedStatement.executeUpdate(): Fatal error: preparedStatement was null");
 		}
 
 		return preparedStatement.executeQuery();

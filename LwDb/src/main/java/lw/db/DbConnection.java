@@ -24,7 +24,7 @@ import lw.utils.LwLogger;
 *	Everything can be wrapped in quotes, but obv no need to wrap numbers.
 *
 **/
-public class LwDbConnection {
+public class DbConnection {
 
     private static final Logger logger = Logger.getLogger("gemha");
 
@@ -49,10 +49,10 @@ public class LwDbConnection {
 	* @param userPass db password - may be null
 	* @param autoCommit set to true if we want to automatically commit transactions when we disconnect.
 	*
-    * @exception LwDbException
+    * @exception DbException
     */
-	public LwDbConnection(String jdbcClass, String dbURL, String userName, String userPass, boolean autoCommit)
-																												throws LwDbException {
+	public DbConnection(String jdbcClass, String dbURL, String userName, String userPass, boolean autoCommit)
+																												throws DbException {
 		checkNullArgument(jdbcClass);
 		checkNullArgument(dbURL);
 
@@ -65,9 +65,9 @@ public class LwDbConnection {
     *
     * @param dbConn the database connection already opened in, for example in an App Server - throws IllegalArgumentException if null
 	*
-    * @exception LwDbException
+    * @exception DbException
     */
-	public LwDbConnection(Connection dbConn) {
+	public DbConnection(Connection dbConn) {
 		checkNullArgument(dbConn);
 		this.dbConn = dbConn;
 	}
@@ -83,10 +83,10 @@ public class LwDbConnection {
 	* @param userPass db password
 	* @param autoCommit set to true if we want to automatically commit transactions when we disconnect.
 	*
-    * @exception LwDbException
+    * @exception DbException
     */
 	private void connectStandAlone(String jdbcClass, String dbURL, String userName, String userPass, boolean autoCommit)
-																												throws LwDbException {
+																												throws DbException {
 		this.dbURL = dbURL;
 		this.userName = userName;
 		this.userPass = userPass;
@@ -99,7 +99,7 @@ public class LwDbConnection {
 			logger.severe("Could not load class " + jdbcClass + " Exception: " + e.getMessage());
 			logger.severe("CLASSPATH is " + System.getProperty("java.class.path"));
 			
-			throw new LwDbException("Could not load class " + jdbcClass + " Exception: " + e.getMessage());
+			throw new DbException("Could not load class " + jdbcClass + " Exception: " + e.getMessage());
 		}
 
 		try {
@@ -134,7 +134,7 @@ public class LwDbConnection {
 		}
 		catch (SQLException se) {
 			logger.severe("Could not create connection to database " + dbURL + " Message: " + se.getMessage() + " Error Code: " + se.getErrorCode());
-			throw new LwDbException("Could not create connection to database " + dbURL + " Message: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
+			throw new DbException("Could not create connection to database " + dbURL + " Message: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
 		}
 	}
 
@@ -156,7 +156,7 @@ public class LwDbConnection {
 	  * @return the SQL as a string
 	  */
 	public void reOpen()
-					throws LwDbException {
+					throws DbException {
 
 		try {
 			dbConn = DriverManager.getConnection(dbURL, userName, userPass);
@@ -175,7 +175,7 @@ public class LwDbConnection {
 		}
 		catch (SQLException se) {
 			logger.severe("Could not create connection to database " + dbURL + " Message: " + se.getMessage() + " Error Code: " + se.getErrorCode());
-			throw new LwDbException("Could not create connection to database " + dbURL + " Message: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
+			throw new DbException("Could not create connection to database " + dbURL + " Message: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
 		}
 	}
 
@@ -184,12 +184,12 @@ public class LwDbConnection {
 	  *
 	  * @param dateFormat the new format for dates in queries and results
 	  *
-      * @exception LwDbException
+      * @exception DbException
       *
 	  */
-	public void setDateFormat(String dateFormat) throws LwDbException {
+	public void setDateFormat(String dateFormat) throws DbException {
 		if (dateFormat == null) {
-			throw new LwDbException("Parameter was null.", -1001);
+			throw new DbException("Parameter was null.", -1001);
 		}
 		else { // remember format in case we close connection and re-open
 			this.dateFormat = dateFormat;
@@ -212,7 +212,7 @@ public class LwDbConnection {
 		}
 		catch (SQLException se) {
 			logger.severe("Could not set Date Format. Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode());
-			throw new LwDbException("Could not set Date Format. Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
+			throw new DbException("Could not set Date Format. Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
 		}
 	}
 
@@ -233,12 +233,12 @@ public class LwDbConnection {
 	  * @param colList the names of columns for which values are to be returned in the query result.
 	  * @param qualList the names of columns, and thLw values, to be ANDed in the WHERE clause.
 	  *
-      * @exception LwDbException
+      * @exception DbException
       *
 	  * @return a LwDbQueryResult containing the results of the query
 	  */
-	public LwDbQueryResult getQueryResults(String objectName, Properties colList, Properties qualList)
-																							throws LwDbException {
+	public DbQueryResult getQueryResults(String objectName, Properties colList, Properties qualList)
+																							throws DbException {
 		checkNullArgument(objectName);
 		checkNullArgument(colList);
 		checkNullArgument(qualList);
@@ -267,7 +267,7 @@ public class LwDbConnection {
 				lastSQL += " FROM " + objectName + " ";
 			}
 			else { // nothing to update!
-				throw new LwDbException("Parameter colList was empty.", -1002);
+				throw new DbException("Parameter colList was empty.", -1002);
 			}
 
 
@@ -310,14 +310,14 @@ public class LwDbConnection {
 		}
 		catch (SQLException se) {
 			logger.severe("SELECT query failed. Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode() + " SQL State: " + se.getSQLState());
-			throw new LwDbException("LwDbConnection.getQueryResults(): SELECT query failed. Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode() + " SQL State: " + se.getSQLState(), se.getErrorCode());
+			throw new DbException("LwDbConnection.getQueryResults(): SELECT query failed. Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode() + " SQL State: " + se.getSQLState(), se.getErrorCode());
 		}
 
 		// Transform result set
 		Vector<Properties> r = getAsPropertySet(results);
 
 		// Create a new Lw results objects
-		LwDbQueryResult eqr = new LwDbQueryResult(r, "COLUMNS");
+		DbQueryResult eqr = new DbQueryResult(r, "COLUMNS");
 
 		try {results.close();} catch (SQLException se) {/* Cannot do anything about this kind of error, just continue */}
 
@@ -330,15 +330,15 @@ public class LwDbConnection {
 	  * @param preparedStatementName the key name of the statement
 	  * @param paramList the names of PARAMETERISED columns only and the values to replace those ?s. Need names so can sort on name, to ensure positional matching. (were sorted in preparation phase)
 	  *
-      * @exception LwDbException
+      * @exception DbException
       *
 	  * @return a LwDbQueryResult containing the results of the query
 	  */
-	public LwDbQueryResult executePreparedQuery(String preparedStatementName, Properties paramList)
-															throws LwDbException {
+	public DbQueryResult executePreparedQuery(String preparedStatementName, Properties paramList)
+															throws DbException {
 
 		if (preparedStatementName == null || paramList == null || paramList.size() < 1) {
-			throw new LwDbException("LwDbConnection.executePreparedStatement(): Required Parameter was null or empty.", -1001);
+			throw new DbException("LwDbConnection.executePreparedStatement(): Required Parameter was null or empty.", -1001);
 		}
 
     	ResultSet results = null;
@@ -351,13 +351,13 @@ public class LwDbConnection {
 			preparedStatement = preparedStatements.get(preparedStatementName);
 
 			if (preparedStatement == null) {
-				throw new LwDbException("PreparedStatement " + preparedStatementName + " does not exist", -1003);
+				throw new DbException("PreparedStatement " + preparedStatementName + " does not exist", -1003);
 			}
 			else {
 				// Make sure correct number of parameters were sent in, otherwise hangs connection
 				if (preparedStatement.getNumParameters() != paramList.size()) {
 					logger.severe("Wrong number of parameter values supplied for execution of PreparedStatement " + preparedStatementName + ". Expected " + preparedStatement.getNumParameters() + ", found " + paramList.size());
-					throw new LwDbException("Wrong number of parameter values supplied for execution of PreparedStatement " + preparedStatementName + ". Expected " + preparedStatement.getNumParameters() + ", found " + paramList.size(), -1004);
+					throw new DbException("Wrong number of parameter values supplied for execution of PreparedStatement " + preparedStatementName + ". Expected " + preparedStatement.getNumParameters() + ", found " + paramList.size(), -1004);
 				}
 
 				preparedStatement.setParameters(paramList);
@@ -369,14 +369,14 @@ public class LwDbConnection {
 		}
 		catch (SQLException se) {
 			logger.severe("Could not execute Prepared Query " + preparedStatementName + ". Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode());
-			throw new LwDbException("LwdbConnection.executePreparedQuery(): Could not execute Prepared Query " + preparedStatementName + ". Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
+			throw new DbException("LwdbConnection.executePreparedQuery(): Could not execute Prepared Query " + preparedStatementName + ". Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
 		}
 
 		// Transform result set
 		Vector<Properties> r = getAsPropertySet(results);
 
 		// Create a new Lw results objects
-		LwDbQueryResult eqr = new LwDbQueryResult(r, preparedStatement.getReturnType());
+		DbQueryResult eqr = new DbQueryResult(r, preparedStatement.getReturnType());
 
 		try {results.close();} catch (SQLException se) {/* Cannot do anything about this kind of error, just continue */}
 
@@ -389,14 +389,14 @@ public class LwDbConnection {
 	  * @param objectName the table in which the row is to inserted
 	  * @param colList the names of columns involved in the insert and the values. Cannot be null or empty.
 	  *
-      * @exception LwDbException
+      * @exception DbException
       *
 	  * @return the number of rows inserted, if successful
 	  */
 	public int insert(String objectName, Properties colList)
-															throws LwDbException {
+															throws DbException {
 		if (objectName == null || colList == null) {
-			throw new LwDbException("LwDbConnection.insert(): Parameter was null.", -1001);
+			throw new DbException("LwDbConnection.insert(): Parameter was null.", -1001);
 		}
 
 		try {
@@ -424,7 +424,7 @@ public class LwDbConnection {
 				lastSQL += strColNames + strColValues;
 			}
 			else { // nothing to lock for update!
-				throw new LwDbException("Parameter colList was empty.", -1002);
+				throw new DbException("Parameter colList was empty.", -1002);
 			}
 
 			logger.fine("lastSQL: " + lastSQL);
@@ -441,7 +441,7 @@ public class LwDbConnection {
 		}
 		catch (SQLException se) {
 			logger.severe("Could not insert row. Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode() + "SQL was: " + lastSQL);
-			throw new LwDbException("LwDbConnection.insert(): Could not insert row. Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
+			throw new DbException("LwDbConnection.insert(): Could not insert row. Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
 		}
 	}
 
@@ -450,13 +450,13 @@ public class LwDbConnection {
 	  *
 	  * @param preparedStatementTemplate the template that will define how to create the statement
 	  *
-      * @exception LwDbException
+      * @exception DbException
       *
 	  */
 	public void prepareStatement(LwPreparedStatementTemplate preparedStatementTemplate)
-																		throws LwDbException {
+																		throws DbException {
 		if (preparedStatementTemplate == null ) {
-			throw new LwDbException("LwDbConnection.prepareStatement(): Required Parameter was null.", -1001);
+			throw new DbException("LwDbConnection.prepareStatement(): Required Parameter was null.", -1001);
 		}
 
 		// If we've already prepared this statement, just return...
@@ -479,7 +479,7 @@ public class LwDbConnection {
 		}
 		catch (SQLException se) {
 			logger.severe("Could not prepare statement " + preparedStatementTemplate.getPreparedStatementName() + ". Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode());
-			throw new LwDbException("LwDbConnection.prepareStatement(): Could not prepare statement " + preparedStatementTemplate.getPreparedStatementName() + ". Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
+			throw new DbException("LwDbConnection.prepareStatement(): Could not prepare statement " + preparedStatementTemplate.getPreparedStatementName() + ". Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
 		}
 	}
 
@@ -490,13 +490,13 @@ public class LwDbConnection {
 	  * @param objectName the table in which the row is to inserted
 	  * @param colList the names of columns involved in the insert. Also a constant value or '?' (to parameterise).
 	  *
-      * @exception LwDbException
+      * @exception DbException
       *
 	  */
 	public void prepareInsert(String preparedStatementName, String objectName, Properties colList)
-															throws LwDbException {
+															throws DbException {
 		if (preparedStatementName == null || colList == null || colList.size() < 1) {
-			throw new LwDbException("LwDbConnection.prepareInsert(): Required Parameter was null or empty.", -1001);
+			throw new DbException("LwDbConnection.prepareInsert(): Required Parameter was null or empty.", -1001);
 		}
 
 		// If we've already prepared this statement, just return...
@@ -505,7 +505,7 @@ public class LwDbConnection {
 		}
 
 		if (objectName == null) {
-			throw new LwDbException("LwDbConnection.prepareInsert(): Required objectName Parameter was null or empty.", -1002);
+			throw new DbException("LwDbConnection.prepareInsert(): Required objectName Parameter was null or empty.", -1002);
 		}
 
 		LwPreparedStatement newPreparedStatement = new LwPreparedStatement(preparedStatementName, "insert", objectName, colList);
@@ -522,7 +522,7 @@ public class LwDbConnection {
 		}
 		catch (SQLException se) {
 			logger.severe("Could not prepare insert " + preparedStatementName + ". Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode());
-			throw new LwDbException("Could not prepare insert " + preparedStatementName + ". Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
+			throw new DbException("Could not prepare insert " + preparedStatementName + ". Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
 		}
 	}
 
@@ -532,14 +532,14 @@ public class LwDbConnection {
 	  * @param preparedStatementName the key name of the statement
 	  * @param paramList the names of PARAMETERISED columns only and the values to replace those ?s. Need names so can sort on name, to ensure positional matching. (were sorted in preparation phase)
 	  *
-      * @exception LwDbException
+      * @exception DbException
       *
 	  * @return the number of rows inserted, if successful
 	  */
 	public int executePreparedStatement(String preparedStatementName, Properties paramList)
-															throws LwDbException {
+															throws DbException {
 		if (preparedStatementName == null || paramList == null || paramList.size() < 1) {
-			throw new LwDbException("LwDbConnection.executePreparedStatement(): Required Parameter was null or empty.", -1001);
+			throw new DbException("LwDbConnection.executePreparedStatement(): Required Parameter was null or empty.", -1001);
 		}
 
 		try {
@@ -549,13 +549,13 @@ public class LwDbConnection {
 			LwPreparedStatement preparedStatement = preparedStatements.get(preparedStatementName);
 
 			if (preparedStatement == null) {
-				throw new LwDbException("PreparedStatement " + preparedStatementName + " does not exist", -1003);
+				throw new DbException("PreparedStatement " + preparedStatementName + " does not exist", -1003);
 			}
 			else {
 				// Make sure correct number of parameters were sent in, otherwise hangs connection
 				if (preparedStatement.getNumParameters() != paramList.size()) {
 					logger.severe("Wrong number of parameter values supplied for execution of PreparedStatement " + preparedStatementName + ". Expected " + preparedStatement.getNumParameters() + ", found " + paramList.size());
-					throw new LwDbException("Wrong number of parameter values supplied for execution of PreparedStatement " + preparedStatementName + ". Expected " + preparedStatement.getNumParameters() + ", found " + paramList.size(), -1004);
+					throw new DbException("Wrong number of parameter values supplied for execution of PreparedStatement " + preparedStatementName + ". Expected " + preparedStatement.getNumParameters() + ", found " + paramList.size(), -1004);
 				}
 
 				preparedStatement.setParameters(paramList);
@@ -569,7 +569,7 @@ public class LwDbConnection {
 		}
 		catch (SQLException se) {
 			logger.severe("Could not execute Prepared Statement " + preparedStatementName + ". Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode());
-			throw new LwDbException("Could not execute Prepared Statement " + preparedStatementName + ". Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
+			throw new DbException("Could not execute Prepared Statement " + preparedStatementName + ". Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
 		}
 	}
 
@@ -580,14 +580,14 @@ public class LwDbConnection {
 	  * @param objectName the table in which the row is to be locked
 	  * @param colList the names of columns to be updated (later) and thLw old values. Cannot be null or empty.
 	  *
-      * @exception LwDbException
+      * @exception DbException
       *
 	  * @return the number of rows locked, if successful, 0 if data has changed
 	  */
 	public int lockForUpdatePessimistic(String objectName, Properties colList)
-																	throws LwDbException {
+																	throws DbException {
 		if (objectName == null || colList == null) {
-			throw new LwDbException("LwDbConnection.lockForUpdatePessimistic(): Parameter was null.", -1001);
+			throw new DbException("LwDbConnection.lockForUpdatePessimistic(): Parameter was null.", -1001);
 		}
 
     	int rowsReturned = 0;
@@ -628,7 +628,7 @@ public class LwDbConnection {
 				}
 			}
 			else { // nothing to lock for update!
-				throw new LwDbException("Parameter colList was empty.", -1002);
+				throw new DbException("Parameter colList was empty.", -1002);
 			}
 
 			logger.fine("lastSQL: " + lastSQL);
@@ -649,11 +649,11 @@ public class LwDbConnection {
 		catch (SQLException se) {
 			if (se.getErrorCode() == 00054) { // then row already locked, and we didn't want to wait
 				logger.warning("Could not lock a row. Already locked.");
-				throw new LwDbException("Could not lock a row. Already locked.", -1005);
+				throw new DbException("Could not lock a row. Already locked.", -1005);
 			}
 			else {
 				logger.severe("Could not lock a row. Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode());
-				throw new LwDbException("Could not lock a row. Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
+				throw new DbException("Could not lock a row. Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
 			}
 		}
 	}
@@ -667,14 +667,14 @@ public class LwDbConnection {
 	  * @param colList the names of columns to be updated and thLw NEW values.
 	  * @param qualList the names of columns, and thLw values, to be ANDed in the WHERE clause.
 	  *
-      * @exception LwDbException
+      * @exception DbException
       *
 	  * @return the number of rows updated, if successful (0..n), < 0 for error (the caller will know whether optimistic "locking" was used, so a return of 0 can be properly interpreted
 	  */
 	public int update(String objectName, Properties colList, Properties qualList)
-																			throws LwDbException {
+																			throws DbException {
 		if (objectName == null || colList == null) {
-			throw new LwDbException("Parameter was null.", -1001);
+			throw new DbException("Parameter was null.", -1001);
 		}
 
 
@@ -698,7 +698,7 @@ public class LwDbConnection {
 				}
 			}
 			else { // nothing to update!
-				throw new LwDbException("Parameter colList was empty.", -1002);
+				throw new DbException("Parameter colList was empty.", -1002);
 			}
 
 
@@ -734,7 +734,7 @@ public class LwDbConnection {
 				}
 			}
 			else { // nothing to lock for update!
-				throw new LwDbException("Parameter qualList was empty.", -1003);
+				throw new DbException("Parameter qualList was empty.", -1003);
 			}
 
 			logger.fine("lastSQL: " + lastSQL);
@@ -751,7 +751,7 @@ public class LwDbConnection {
 		}
 		catch (SQLException se) {
 			logger.severe("Could not update row(s). Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode());
-			throw new LwDbException("Could not update row(s). Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
+			throw new DbException("Could not update row(s). Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
 		}
 	}
 
@@ -761,14 +761,14 @@ public class LwDbConnection {
 	  * @param objectName the table from which the row is to be deleted
 	  * @param colList the names of columns to be used in the WHERE clause and thLw old values. If empty or null, ALL rows will be deleted.
 	  *
-      * @exception LwDbException
+      * @exception DbException
       *
 	  * @return the number of rows locked, if successful, 0 if data has changed
 	  */
 	public int delete(String objectName, Properties colList)
-													throws LwDbException {
+													throws DbException {
 		if (objectName == null) {
-			throw new LwDbException("Parameter was null.", -1001);
+			throw new DbException("Parameter was null.", -1001);
 		}
 
 		try {
@@ -818,51 +818,51 @@ public class LwDbConnection {
 		}
 		catch (SQLException se) {
 			logger.severe("Could not delete row(s). Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode());
-			throw new LwDbException("Could not delete row(s). Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
+			throw new DbException("Could not delete row(s). Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
 		}
 	}
 
 	/**
         * This method rolls back a database transaction.
         *
-        * @exception LwDbException
+        * @exception DbException
         */
 	public void sessionRollback()
-							throws LwDbException {
+							throws DbException {
 
 		try {
 			dbConn.rollback();
 			numUncommitedRows = 0;
 		}
 		catch(SQLException se) {
-			throw new LwDbException("Could not roll back transaction. Message: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
+			throw new DbException("Could not roll back transaction. Message: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
 		}
 	}
 
 	/**
         * This method commits a database transaction.
         *
-        * @exception LwDbException
+        * @exception DbException
         */
 	public void sessionCommit()
-							throws LwDbException {
+							throws DbException {
 
 		try {
 			dbConn.commit();
 			numUncommitedRows = 0;
 		}
 		catch(SQLException se) {
-			throw new LwDbException("Could not commit transaction. Message: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
+			throw new DbException("Could not commit transaction. Message: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
 		}
 	}
 
 	/**
         * This method commits database transactions, if we've reached the specified number of actions (inserts, updates or deletes).
         *
-        * @exception LwDbException
+        * @exception DbException
         */
 	public void sessionCommitIfReached(int uncommitedRowsLimit)
-											throws LwDbException {
+											throws DbException {
 
 		if (numUncommitedRows >= uncommitedRowsLimit) {
 			this.sessionCommit();
@@ -875,11 +875,11 @@ public class LwDbConnection {
 	  *
 	  * @param preparedStatementName the key name of the statement
 	  *
-      * @exception LwDbException
+      * @exception DbException
       *
 	  */
 	public void reInstatePreparedStatements()
-									throws LwDbException {
+									throws DbException {
 
 		for (String preparedStatementName : preparedStatements.keySet()) {
 			reInstatePreparedStatement(preparedStatementName);
@@ -891,11 +891,11 @@ public class LwDbConnection {
 	  *
 	  * @param preparedStatementName the key name of the statement
 	  *
-      * @exception LwDbException
+      * @exception DbException
       *
 	  */
 	public void reInstatePreparedStatement(String preparedStatementName)
-														throws LwDbException {
+														throws DbException {
 		checkNullArgument(preparedStatementName);
 		try {
 			LwPreparedStatement p = preparedStatements.get(preparedStatementName);
@@ -906,7 +906,7 @@ public class LwDbConnection {
 		}
 		catch (SQLException se) {
 			logger.severe("Could not re-instate prepared statement " + preparedStatementName + ". Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode());
-			throw new LwDbException("Could not re-instate prepared statement " + preparedStatementName + ". Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
+			throw new DbException("Could not re-instate prepared statement " + preparedStatementName + ". Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
 		}
 	}
 
@@ -915,11 +915,11 @@ public class LwDbConnection {
 	  *
 	  * @param preparedStatementName the key name of the statement
 	  *
-      * @exception LwDbException
+      * @exception DbException
       *
 	  */
 	public void closePreparedStatements()
-									throws LwDbException {
+									throws DbException {
 
 		for (String preparedStatementName : preparedStatements.keySet()) {
 			closePreparedStatement(preparedStatementName);
@@ -932,11 +932,11 @@ public class LwDbConnection {
 	  *
 	  * @param preparedStatementName the key name of the statement
 	  *
-      * @exception LwDbException
+      * @exception DbException
       *
 	  */
 	public void closePreparedStatement(String preparedStatementName)
-														throws LwDbException {
+														throws DbException {
 		checkNullArgument(preparedStatementName);
 		try {
 			LwPreparedStatement p = preparedStatements.get(preparedStatementName);
@@ -947,7 +947,7 @@ public class LwDbConnection {
 		}
 		catch (SQLException se) {
 			logger.severe("Could not close prepared statement " + preparedStatementName + ". Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode());
-			throw new LwDbException("Could not close prepared statement " + preparedStatementName + ". Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
+			throw new DbException("Could not close prepared statement " + preparedStatementName + ". Caught exception: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
 		}
 	}
 
@@ -1054,7 +1054,7 @@ public class LwDbConnection {
 		// executed before ours), so a FileWriter object is used instead.
 
 		// close the preparedStatements
-		try {closePreparedStatements();} catch(LwDbException e) {/* do nothing, closing database anyway */}
+		try {closePreparedStatements();} catch(DbException e) {/* do nothing, closing database anyway */}
 
 		// Closing session object
 		try{
@@ -1075,7 +1075,7 @@ public class LwDbConnection {
 				else {
 					logger.warning("Could not properly close connection to database " + dbURL + " Message: " + se.getMessage() + " Error Code: " + se.getErrorCode());
 				}
-				throw new LwDbException("Could not properly close connection to database " + dbURL + " Message: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
+				throw new DbException("Could not properly close connection to database " + dbURL + " Message: " + se.getMessage() + " Error Code: " + se.getErrorCode(), se.getErrorCode());
 			}
 
 		}

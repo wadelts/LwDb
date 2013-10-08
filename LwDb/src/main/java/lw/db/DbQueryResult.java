@@ -7,7 +7,7 @@ import java.util.*;
   * @author Liam Wade
   * @version 1.0 04/12/2008
   */
-public class LwDbQueryResult {
+public class DbQueryResult {
 
 	private Vector<Properties> result = null;		// the actual rows and columns for the query result
 	private String returnType = "COLUMNS";
@@ -15,14 +15,14 @@ public class LwDbQueryResult {
   /**
     * Will create a new LwDbQueryResult.
     */
-	public LwDbQueryResult() {
+	public DbQueryResult() {
 	}
 
   /**
     * Will create a new LwDbQueryResult.
 	* @param result the text explaining the error
     */
-	public LwDbQueryResult(Vector<Properties> result, String returnType) {
+	public DbQueryResult(Vector<Properties> result, String returnType) {
 		checkNullArgument(result);
 		checkNullArgument(returnType);
 
